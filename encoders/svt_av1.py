@@ -5,6 +5,7 @@ class svt_av1(encoder_base):
     def __init__(self,encoder_path:str = 'SvtAv1EncApp',ext:str = 'ivf',multipass:int = 0):
         super(svt_av1,self).__init__(encoder_path,ext,multipass)
         self.multipass = multipass
+        self.name="svt_av1"
     
     def getbitrate(self,log:str) -> float:
         m=re.search(r".+?([0-9.]+) kbps",log,re.I)

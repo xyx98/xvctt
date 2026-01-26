@@ -57,11 +57,13 @@ class vmaf(metric):
         match=rex.search(script)
         clip=match.group(1)
         
+        feature=self.extra_metrics if self.extra_metrics else None
+        
         script=rex.sub("",script)
         script+=f'\nimport xvs\n'
         script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
-        script+=f'last=core.vmaf.VMAF({clip}, dst, log_path={self.infopath(dstpath)}, log_format=1, model={model},feature={self.extra_metrics})'
+        script+=f'last=core.vmaf.VMAF({clip}, dst, log_path="{self.infopath(dstpath)}", log_format=1, model={model},feature={feature})\n'
         script+=f'last.set_output()'
         return script
     

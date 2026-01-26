@@ -4,6 +4,7 @@ from .base import encoder_base
 class x265(encoder_base):
     def __init__(self,encoder_path:str = 'x265',ext:str = 'hevc',multipass:int = 0):
         super(x265,self).__init__(encoder_path,ext,multipass)
+        self.name="x265"
     
     def getbitrate(self,log:str) -> float:
         return super(x265,self).getbitrate(log)

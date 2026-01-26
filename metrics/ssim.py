@@ -6,7 +6,7 @@ import statistics
 
 class ssim(metric):
     def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.harmonic):
-        self.provide=["ssim","ssim-u","ssim-y","ssim-yuv"]
+        self.provide=["ssim","ssim-u","ssim-v","ssim-yuv"]
         self.name="ssim"
         self.charset=charset
         self.mean_mode=mean_mode

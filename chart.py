@@ -18,28 +18,28 @@ def render_chart_to_string(self, template_name: str, chart: Any, **kwargs):
 engine.RenderEngine.render_chart_to_string=render_chart_to_string
 
 theme_color={
-    "light"         :{'bg':'rgba(0,0,0,0)','title':"#464646",'sub':'#6E7079'},#ok
-    "dark"          :{'bg':'rgba(51,51,51,1)','title':"#eeeeee",'sub':'#aaa'},#ok
-    "white"         :{'bg':'rgba(0,0,0,0)','title':"#464646",'sub':'#6E7079'},#ok
-    "chalk"         :{'bg':'rgba(41,52,65,1)','title':"#ffffff",'sub':'#dddddd'},#ok
-    "essos"         :{'bg':'rgba(242,234,191,0.15)','title':"#893448",'sub':'#d95850'},#ok
-    "infographic"   :{'bg':'rgba(0,0,0,0)','title':"#27727b",'sub':'#6E7079'},#ok
-    "macarons"      :{'bg':'rgba(0,0,0,0)','title':"#008acd",'sub':'#aaa'},#ok
-    "purple-passion":{'bg':'rgba(91,92,110,1)','title':"#ffffff",'sub':'#cccccc'},#ok
-    "roma"          :{'bg':'rgba(0,0,0,0)','title':"#333333",'sub':'#aaa'},#ok
-    "romantic"      :{'bg':'#f0e8cd','title':"#330022",'sub':'#3d2f1b'},#ok
-    "shine"         :{'bg':'rgba(0,0,0,0)','title':"#333333",'sub':'#aaa'},#ok
-    "vintage"       :{'bg':'rgba(254,248,239,1)','title':"#333333",'sub':'#aaa'},#ok
-    "walden"        :{'bg':'rgba(252,252,252,0)','title':"#666666",'sub':'#999999'},#ok
-    "westeros"      :{'bg':'rgba(0,0,0,0)','title':"#516b91",'sub':'#93b7e3'},#ok
-    "wonderland"    :{'bg':'rgba(255,255,255,0)','title':'#666666','sub':'#999999'},#ok
-    "halloween"     :{'bg':'rgba(64,64,64,0.5)','title':"#ffaf51",'sub':'#eeeeee'},#ok
+    "light"         :{'bg':'rgba(0,0,0,0)','title':"#464646",'sub':'#6E7079'},
+    "dark"          :{'bg':'rgba(51,51,51,1)','title':"#eeeeee",'sub':'#aaa'},
+    "white"         :{'bg':'rgba(0,0,0,0)','title':"#464646",'sub':'#6E7079'},
+    "chalk"         :{'bg':'rgba(41,52,65,1)','title':"#ffffff",'sub':'#dddddd'},
+    "essos"         :{'bg':'rgba(242,234,191,0.15)','title':"#893448",'sub':'#d95850'},
+    "infographic"   :{'bg':'rgba(0,0,0,0)','title':"#27727b",'sub':'#6E7079'},
+    "macarons"      :{'bg':'rgba(0,0,0,0)','title':"#008acd",'sub':'#aaa'},
+    "purple-passion":{'bg':'rgba(91,92,110,1)','title':"#ffffff",'sub':'#cccccc'},
+    "roma"          :{'bg':'rgba(0,0,0,0)','title':"#333333",'sub':'#aaa'},
+    "romantic"      :{'bg':'#f0e8cd','title':"#330022",'sub':'#3d2f1b'},
+    "shine"         :{'bg':'rgba(0,0,0,0)','title':"#333333",'sub':'#aaa'},
+    "vintage"       :{'bg':'rgba(254,248,239,1)','title':"#333333",'sub':'#aaa'},
+    "walden"        :{'bg':'rgba(252,252,252,0)','title':"#666666",'sub':'#999999'},
+    "westeros"      :{'bg':'rgba(0,0,0,0)','title':"#516b91",'sub':'#93b7e3'},
+    "wonderland"    :{'bg':'rgba(255,255,255,0)','title':'#666666','sub':'#999999'},
+    "halloween"     :{'bg':'rgba(64,64,64,0.5)','title':"#ffaf51",'sub':'#eeeeee'},
 }
 
 
 
 class chart:
-    def __init__(self,title:str,metrics_provider:str,metrics_name:str,embed_echarts:bool=True,theme=ThemeType.VINTAGE):
+    def __init__(self,title:str,metrics_provider:str,metrics_name:str,embed_echarts:bool=False,theme=ThemeType.VINTAGE):
         self.title=title
         self.metrics_provider=metrics_provider
         self.metrics_name=metrics_name

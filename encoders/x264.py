@@ -4,7 +4,7 @@ from .base import encoder_base
 class x264(encoder_base):
     def __init__(self,encoder_path:str = 'x264',ext:str = '264',multipass:int = 0):
         super(x264,self).__init__(encoder_path,ext,multipass)
-        self.multipass = multipass
+        self.name="x264"
     
     def getbitrate(self,log:str) -> float:
         return super(x264,self).getbitrate(log)

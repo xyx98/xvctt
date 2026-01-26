@@ -6,6 +6,7 @@ class encoder_base:
         self.ext=ext
         self.sep=' '
         self.multipass=multipass
+        self.name=""
     
     def getbitrate(self,log:str) -> float:
         m=re.search(r'encoded (\d+) frames.+?([0-9.]+) fps.+?([0-9.]+) kb/s',log,re.I)

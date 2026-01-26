@@ -1,8 +1,13 @@
 from abc import ABC,abstractmethod
+from ..utils import MEAN
+
 class metric(ABC):
     @abstractmethod
-    def __init__(self,charset:str):
-        pass
+    def __init__(self,charset:str,mean_mode:MEAN=MEAN.harmonic):
+        self.provide=[]
+        self.name=""
+        self.charset=charset
+        self.mean_mode=mean_mode
     
     @abstractmethod
     def genscript(self,orgscript:str,dstpath:str) -> str:

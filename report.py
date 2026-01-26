@@ -93,7 +93,7 @@ class htmlreport:
         divs[0].style.height=h+'px';
         }
         window.addEventListener("resize",resize);
-        """.replace("metrics_provider_metric_name",f"{metrics_provider}_{metric_name}")
+        """.replace("metrics_provider_metric_name",f"{metrics_provider}_{metric_name}".replace('-','_'))
         self.soup.body.append(resize_script)
         
         
