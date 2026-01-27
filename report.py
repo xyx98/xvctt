@@ -131,7 +131,9 @@ class htmlreport:
                 
                 if isfirst:
                     if calcbdrate:
-                        lines+=f"<td rowspan={lenq}>{bdrate(self.ref,data,metrics_provider,metric_name):.02f}%</td>"
+                        bdrate_res=bdrate(self.ref,data,metrics_provider,metric_name)
+                        bdrate_res=f"{bdrate_res:.02f}%" if bdrate_res else "N/A"
+                        lines+=f"<td rowspan={lenq}>{bdrate_res}</td>"
                     
                     lines+=f"<td rowspan={lenq}>{data["encode_settings"]["encoder"].strip()} {data["encode_settings"]["cmd"].strip()}</td>"
                     isfirst=False
