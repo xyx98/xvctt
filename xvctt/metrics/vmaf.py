@@ -67,11 +67,17 @@ class vmaf(metric):
         script+=f'last.set_output()'
         return script
     
-    def infopath(self,dstpath:str) -> str:
-        if self.model==vmaf_model.none:
-            return f"{dstpath}_{self.name}_mnone.json"
+    def infopath(self,dstpath:str,fin:bool=False) -> str:
+        if fin:
+            if self.model==vmaf_model.none:
+                return f"{dstpath}_{self.name}_mnone_fin.json"
+            else:
+                return f"{dstpath}_{self.name}_m{self.model.value[0]}_fin.json"
         else:
-            return f"{dstpath}_{self.name}_m{self.model.value[0]}.json"
+            if self.model==vmaf_model.none:
+                return f"{dstpath}_{self.name}_mnone.json"
+            else:
+                return f"{dstpath}_{self.name}_m{self.model.value[0]}.json"
         
     
     def getresult(self, infopath:str) -> dict[str,float|int]:

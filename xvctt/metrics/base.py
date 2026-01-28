@@ -14,7 +14,7 @@ class metric(ABC):
         pass
     
     @abstractmethod
-    def infopath(self,dstpath:str) -> str:
+    def infopath(self,dstpath:str,fin:bool=False) -> str:
         pass
     
     @abstractmethod

@@ -24,12 +24,15 @@ class gmsd(metric):
         script+=f'\nimport xvs\n'
         script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
-        script+=f'last=xvs.GMSD2csv({clip},dst,file="{dstpath}_{self.name}.csv",planes=[0,1,2])\n'
+        script+=f'last=xvs.GMSD2csv({clip},dst,file="{self.infopath(dstpath)}.csv",planes=[0,1,2])\n'
         script+=f'last.set_output()'
         return script
     
-    def infopath(self,dstpath:str) -> str:
-        return f"{dstpath}_{self.name}.csv"
+    def infopath(self,dstpath:str,fin:bool=False) -> str:
+        if fin:
+            return f"{dstpath}_{self.name}_fin.csv"
+        else:
+            return f"{dstpath}_{self.name}.csv"
     
     def getresult(self, infopath:str) -> dict[str,float|int]:
         with open(infopath,"r") as file:

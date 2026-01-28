@@ -30,8 +30,11 @@ class dssim(metric):
         script+=f'last.set_output()'
         return script
     
-    def infopath(self,dstpath:str) -> str:
-        return f"{dstpath}_{self.name}.csv"
+    def infopath(self,dstpath:str,fin:bool=False) -> str:
+        if fin:
+            return f"{dstpath}_{self.name}_fin.csv"
+        else:
+            return f"{dstpath}_{self.name}.csv"
     
     def getresult(self, infopath:str) -> dict[str,float|int]:
         with open(infopath,"r") as file:

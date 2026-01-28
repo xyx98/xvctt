@@ -68,13 +68,19 @@ class atomTest:
 
         returncode=0
         for m in self.metrics:
-            if os.path.exists(m.infopath(f"{output}_fin.{self.encoder.ext}")): #simple check
+            if os.path.exists(m.infopath(f"{output}_fin.{self.encoder.ext}",fin=True)): #simple check
                 continue
             script=m.genscript(self.vpypath,f"{output}_fin.{self.encoder.ext}")
             with open (".metric.vpy",'w',encoding=m.charset) as file:
                 file.write(script)
                 
             sp=subprocess.run(f'{self.vspipe} -p ".metric.vpy" .',shell=True)
+            if sp.returncode==0:
+                os.rename(
+                    m.infopath(f"{output}_fin.{self.encoder.ext}",fin=False),
+                    m.infopath(f"{output}_fin.{self.encoder.ext}",fin=True)
+                )
+
             returncode=returncode or sp.returncode
             os.remove(".metric.vpy")
         if returncode==0:
@@ -106,7 +112,7 @@ class atomTest:
         res={"fps":fps,"bitrate":bitrate,"metrics":{}}
         
         for m in self.metrics:
-            res["metrics"][m.name]=m.getresult(m.infopath(filepath))
+            res["metrics"][m.name]=m.getresult(m.infopath(filepath,fin=True))
             
         return res
     
