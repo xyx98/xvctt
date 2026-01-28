@@ -35,4 +35,7 @@ def bdrate(ref_data:dict,test_data:dict,metric_provider:str,metric_name:str,meth
     except:
         return
     
-    return res
+    if res==res: 
+        return res
+    else: # check whether res is nan.
+        return
