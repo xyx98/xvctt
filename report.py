@@ -80,7 +80,7 @@ class htmlreport:
         var divs = document.getElementsByTagName("div");
         divs[0].style.width =w+'px';
         divs[0].style.height=h+'px';
-        """.replace("metrics_provider_metric_name",f"{metrics_provider}_{metric_name}")
+        """.replace("metrics_provider_metric_name",f"{metrics_provider}_{metric_name}".replace('-','_'))
         
         resize_script = self.soup.new_tag("script")
         resize_script.string="""
