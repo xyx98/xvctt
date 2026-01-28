@@ -2,9 +2,8 @@ from .base import encoder_base
 import re
 
 class svt_av1(encoder_base):
-    def __init__(self,encoder_path:str = 'SvtAv1EncApp',ext:str = 'ivf',multipass:int = 0):
-        super(svt_av1,self).__init__(encoder_path,ext,multipass)
-        self.multipass = multipass
+    def __init__(self,encoder_path:str = 'SvtAv1EncApp',ext:str = 'ivf'):
+        super(svt_av1,self).__init__(encoder_path,ext)
         self.name="svt_av1"
     
     def getbitrate(self,log:str) -> float:
@@ -21,9 +20,5 @@ class svt_av1(encoder_base):
         else:
             return -1
     
-    def gencmd(self,cmd:str,q:int|float|str,output:str,p:int = None) -> str:
-        p = 0 if p is None else p
-        if p == 0:
-            return f'{self.encoder_path} {cmd.format(q=q,output=output)}'
-        else:
-            return f'{self.encoder_path} --pass {p} {cmd.format(q=q,output=output)}'
+    def gencmd(self,cmd:str,q:int|float|str,output:str) -> str:
+        return f'{self.encoder_path} {cmd.format(q=q,output=output)}'

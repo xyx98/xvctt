@@ -1,11 +1,11 @@
 import re
 
 class encoder_base:
-    def __init__(self,encoder_path:str,ext:str,multipass:int):
+    def __init__(self,encoder_path:str,ext:str):
         self.encoder_path=encoder_path
         self.ext=ext
         self.sep=' '
-        self.multipass=multipass
+        self.multipass=1
         self.name=""
     
     def getbitrate(self,log:str) -> float:
