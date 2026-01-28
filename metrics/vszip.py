@@ -53,3 +53,94 @@ class vszip_ssimulacra2(metric):
         return {
             "ssimulacra2":mean(ssimulacra2),
         }
+        
+class vszip_xpsnr(metric):
+    def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.harmonic,temporal:bool=True,inf:int|float=100):
+        self.provide=["xpsnr","xpsnr-u","xpsnr-v","xpsnr-yuv"]
+        self.name="vszip_xpsnr"
+        self.charset=charset
+        self.mean_mode=mean_mode
+        self.temporal=temporal
+        self.inf=inf 
+        #xpsnr's range is 0..inf
+        #self.inf>0:when mean calculation,max xpsnr score is self.inf,
+        #self.inf<=0:when mean calculation,ingore inf score,if all frames score is inf,set result to abs(self.inf)
+    
+    def genscript(self, orgscript:str,dstpath:str) -> str:
+        with open(orgscript,'r',encoding=self.charset) as file:
+            script=file.read()
+        
+        rex=re.compile(r"(.+)\.set_output\(\)")
+        
+        match=rex.search(script)
+        clip=match.group(1)
+        
+        script=rex.sub("",script)
+        script+=f'\nimport xvs\n'
+        script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
+        script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
+        script+=f'last=core.vszip.XPSNR({clip},dst,temporal={self.temporal},verbose=True)\n'
+        script+=f'last=xvs.props2csv(last,["XPSNR_Y","XPSNR_U","XPSNR_V"],["Y","U","V"],"{self.infopath(dstpath)}")\n'
+        script+=f'last.set_output()'
+        return script
+    
+    def infopath(self,dstpath:str) -> str:
+        return f"{dstpath}_{self.name}.csv"
+    
+    def getresult(self, infopath:str) -> dict[str,float|int]:
+        with open(infopath,"r") as file:
+            data=[i for i in csv.DictReader(file,delimiter="\t")]
+            
+        if 'U' not in data[0].keys():
+            raise RuntimeError("Only support yuv!")
+
+        if self.mean_mode==MEAN.average:
+            mean=statistics.fmean
+        elif self.mean_mode==MEAN.harmonic:
+            mean=statistics.harmonic_mean
+        elif self.mean_mode==MEAN.geometric:
+            mean=statistics.geometric_mean
+        elif self.mean_mode==MEAN.quadratic:
+            mean=lambda i: (sum(map(lambda x: x**2),i)/len(i))**0.5
+
+        xpsnr=[]
+        xpsnru=[]
+        xpsnrv=[]
+        xpsnryuv=[]
+        if self.inf>0:
+            for line in data:
+                Y,U,V=line['Y'],line['U'],line['V']
+                Y=self.inf if Y.strip()=="inf" else min(float(Y),self.inf)
+                xpsnr.append(Y)
+                U=self.inf if U.strip()=="inf" else min(float(U),self.inf)                
+                xpsnru.append(U)
+                V=self.inf if V.strip()=="inf" else min(float(V),self.inf)                    
+                xpsnrv.append(V)
+                xpsnryuv.append((Y*4+U+V)/6)#weighted average 4:1:1 for yuv
+        else:
+            
+            for line in data:
+                Y,U,V=line['Y'],line['U'],line['V']
+                YUV_NUM=0
+                YUV_DEN=0
+                if Y.strip()!="inf":
+                    xpsnr.append(float(Y))
+                    YUV_NUM+=4*float(Y)
+                    YUV_DEN+=4
+                if U.strip()!="inf":
+                    xpsnr.append(float(U))
+                    YUV_NUM+=float(U)
+                    YUV_DEN+=1
+                if V.strip()!="inf":
+                    xpsnr.append(float(V))
+                    YUV_NUM+=float(V)
+                    YUV_DEN+=1
+                if YUV_DEN>0:
+                    xpsnryuv.append(YUV_NUM/YUV_DEN)
+                
+        return {
+            "xpsnr":mean(xpsnr) if len(xpsnr)>0 else abs(self.inf),
+            "xpsnr-u":mean(xpsnru) if len(xpsnru)>0 else abs(self.inf),
+            "xpsnr-v":mean(xpsnrv) if len(xpsnrv)>0 else abs(self.inf),
+            "xpsnr-yuv":mean(xpsnryuv) if len(xpsnryuv)>0 else abs(self.inf)
+        }
