@@ -46,7 +46,7 @@ class mainTest:
         if output is None:
             output=f"{metrics_provider}_{metric_name}.html"
         
-        ref=max(min(0,ref),len(self.singles)-1)
+        ref=min(max(0,ref),len(self.singles)-1)
         
         c=chart(self.title,metrics_provider,metric_name,embed_echarts,self.theme)
         
