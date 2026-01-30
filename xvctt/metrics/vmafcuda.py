@@ -16,6 +16,7 @@ class vmafcuda(metric):
         self.model=model
         self.extra_metrics=extra_metrics
         self.use_vmaf_pool=use_vmaf_pool
+        self.use_vspipe=True
         
         if use_vmaf_pool:
             if self.mean_mode!=MEAN.average and self.mean_mode!=MEAN.harmonic:
@@ -59,7 +60,10 @@ class vmafcuda(metric):
         script+=f'last=core.vmafcuda.VMAF({clip}, dst, log_path="{self.infopath(dstpath)}", log_format=1, model={model},feature={feature})\n'
         script+=f'last.set_output()'
         return script
-    
+
+    def run_without_vsipe(self, orgscript:str, dstpath:str):
+        raise NotImplementedError("Not supported!")
+
     def infopath(self,dstpath:str,fin:bool=False) -> str:
         if fin:
             if self.model==vmaf_model.none:

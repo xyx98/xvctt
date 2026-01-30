@@ -8,11 +8,16 @@ class metric(ABC):
         self.name=""
         self.charset=charset
         self.mean_mode=mean_mode
+        self.use_vspipe=True
     
     @abstractmethod
     def genscript(self,orgscript:str,dstpath:str) -> str:
         pass
     
+    @abstractmethod
+    def run_without_vsipe(self,orgscript:str,dstpath:str) -> bool:
+        pass
+
     @abstractmethod
     def infopath(self,dstpath:str,fin:bool=False) -> str:
         pass

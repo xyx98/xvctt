@@ -15,7 +15,7 @@ class vmaf_model(Enum):
 
 
 class vmaf(metric):
-    def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.harmonic,model:vmaf_model=vmaf_model.vmaf_v0_6_1,extra_metrics:list[int]=[],use_vmaf_pool:bool=False):
+    def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.harmonic,model:vmaf_model=vmaf_model.vmaf_v0_6_1,extra_metrics:list[int]=[],use_vmaf_pool:bool=True):
         self.provide=[]
         self.name="vmaf"
         self.charset=charset
@@ -23,6 +23,7 @@ class vmaf(metric):
         self.model=model
         self.extra_metrics=extra_metrics
         self.use_vmaf_pool=use_vmaf_pool
+        self.use_vspipe=True
         
         if use_vmaf_pool:
             if self.mean_mode!=MEAN.average and self.mean_mode!=MEAN.harmonic:
@@ -66,7 +67,10 @@ class vmaf(metric):
         script+=f'last=core.vmaf.VMAF({clip}, dst, log_path="{self.infopath(dstpath)}", log_format=1, model={model},feature={feature})\n'
         script+=f'last.set_output()'
         return script
-    
+
+    def run_without_vsipe(self, orgscript:str, dstpath:str):
+        raise NotImplementedError("Not supported!")
+
     def infopath(self,dstpath:str,fin:bool=False) -> str:
         if fin:
             if self.model==vmaf_model.none:
@@ -78,7 +82,6 @@ class vmaf(metric):
                 return f"{dstpath}_{self.name}_mnone.json"
             else:
                 return f"{dstpath}_{self.name}_m{self.model.value[0]}.json"
-        
     
     def getresult(self, infopath:str) -> dict[str,float|int]:
         with open(infopath,'r') as file:

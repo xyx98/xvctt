@@ -70,19 +70,30 @@ class atomTest:
         for m in self.metrics:
             if os.path.exists(m.infopath(f"{output}_fin.{self.encoder.ext}",fin=True)): #simple check
                 continue
-            script=m.genscript(self.vpypath,f"{output}_fin.{self.encoder.ext}")
-            with open (".metric.vpy",'w',encoding=m.charset) as file:
-                file.write(script)
-                
-            sp=subprocess.run(f'{self.vspipe} -p ".metric.vpy" .',shell=True)
-            if sp.returncode==0:
-                os.rename(
-                    m.infopath(f"{output}_fin.{self.encoder.ext}",fin=False),
-                    m.infopath(f"{output}_fin.{self.encoder.ext}",fin=True)
-                )
 
-            returncode=returncode or sp.returncode
-            os.remove(".metric.vpy")
+            if m.use_vspipe:
+                script=m.genscript(self.vpypath,f"{output}_fin.{self.encoder.ext}")
+                with open (".metric.vpy",'w',encoding=m.charset) as file:
+                    file.write(script)
+                    
+                sp=subprocess.run(f'{self.vspipe} -p ".metric.vpy" .',shell=True)
+                if sp.returncode==0:
+                    os.rename(
+                        m.infopath(f"{output}_fin.{self.encoder.ext}",fin=False),
+                        m.infopath(f"{output}_fin.{self.encoder.ext}",fin=True)
+                    )
+
+                returncode=returncode or sp.returncode
+                os.remove(".metric.vpy")
+            else:
+                success=m.run_without_vsipe(self.vpypath,f"{output}_fin.{self.encoder.ext}")
+                if not success:
+                    returncode = 1
+                else:
+                    os.rename(
+                        m.infopath(f"{output}_fin.{self.encoder.ext}",fin=False),
+                        m.infopath(f"{output}_fin.{self.encoder.ext}",fin=True)
+                    )
         if returncode==0:
             self.succuss=1
             return True

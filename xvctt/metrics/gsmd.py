@@ -3,13 +3,15 @@ import re
 import csv
 from ..utils import MEAN
 import statistics
+import textwrap
 
 class gmsd(metric):
-    def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.average):
+    def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.average,use_vspipe:bool=True):
         self.provide=["gmsd","gmsd-u","gmsd-v","gmsd-yuv"]
         self.name="gmsd"
         self.charset=charset
         self.mean_mode=mean_mode
+        self.use_vspipe=use_vspipe
     
     def genscript(self, orgscript:str,dstpath:str) -> str:
         with open(orgscript,'r',encoding=self.charset) as file:
@@ -27,7 +29,49 @@ class gmsd(metric):
         script+=f'last=xvs.GMSD2csv({clip},dst,file="{self.infopath(dstpath)}.csv",planes=[0,1,2])\n'
         script+=f'last.set_output()'
         return script
-    
+
+    def run_without_vsipe(self, orgscript:str, dstpath:str):
+        with open(orgscript,'r',encoding=self.charset) as file:
+            script=file.read()
+        
+        rex=re.compile(r"(.+)\.set_output\(\)")
+        
+        match=rex.search(script)
+        clip=match.group(1)
+        
+        script=rex.sub("",script)
+        script+=f'\nimport xvs\n'
+        script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
+        script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
+
+        script+=f'Y=xvs.GMSD({clip},dst,plane=0)\n'
+        script+=f'U=xvs.GMSD({clip},dst,plane=1)\n'
+        script+=f'V=xvs.GMSD({clip},dst,plane=2)\n\n'
+        script+=textwrap.dedent(
+        r"""        
+        import time
+        with open(r"<output>","w") as file:
+            file.write("n,Y,U,V\n")
+            length=len(src)
+            stime=time.time()
+            for i in range(length):
+                file.write(f"{i},{Y.get_frame(i).props["PlaneGMSD"]},{U.get_frame(i).props["PlaneGMSD"]},{V.get_frame(i).props["PlaneGMSD"]}\n")
+                if i % 5 == 0:
+                    print(f"\r{i+1}/{length}",end="",flush=True)
+            print(f"\r{i+1}/{length}",end="",flush=True)
+            print()
+            etime=time.time()
+            fps=length/(etime-stime)
+            print(f"{fps:.02f} fps")
+        """.replace("<output>",self.infopath(dstpath)))
+        try:
+            exec(script)
+        except:
+            return False
+        else:
+            return True
+
+
     def infopath(self,dstpath:str,fin:bool=False) -> str:
         if fin:
             return f"{dstpath}_{self.name}_fin.csv"

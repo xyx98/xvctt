@@ -3,14 +3,16 @@ import re
 import csv
 from ..utils import MEAN
 import statistics
+import textwrap
 
 class vszip_ssimulacra2(metric):
-    def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.harmonic):
+    def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.harmonic,use_vspipe:bool=True):
         self.provide=["ssimulacra2"]
         self.name="vszip_ssimulacra2"
         self.charset=charset
         self.mean_mode=mean_mode
-    
+        self.use_vspipe=use_vspipe
+
     def genscript(self, orgscript:str,dstpath:str) -> str:
         with open(orgscript,'r',encoding=self.charset) as file:
             script=file.read()
@@ -29,6 +31,43 @@ class vszip_ssimulacra2(metric):
         script+=f'last.set_output()'
         return script
     
+    def run_without_vsipe(self, orgscript:str, dstpath:str):
+        with open(orgscript,'r',encoding=self.charset) as file:
+            script=file.read()
+        
+        rex=re.compile(r"(.+)\.set_output\(\)")
+        
+        match=rex.search(script)
+        clip=match.group(1)
+        
+        script=rex.sub("",script)
+        script+=f'\nimport xvs\n'
+        script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
+        script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
+        script+=f'last=core.vszip.SSIMULACRA2({clip},dst)\n\n'
+        script+=textwrap.dedent(
+        r"""        
+        import time
+        with open(r"<output>","w") as file:
+            file.write("n\tSSIMULACRA2\n")
+            length=len(src)
+            stime=time.time()
+            for i in range(length):
+                fprop=last.get_frame(i).props
+                file.write(f"{i}\t{fprop["SSIMULACRA2"]}\n")
+                print(f"\r{i+1}/{length}",end="",flush=True)
+            print()
+            etime=time.time()
+            fps=length/(etime-stime)
+            print(f"{fps:.02f} fps")
+        """.replace("<output>",self.infopath(dstpath)))
+        try:
+            exec(script)
+        except:
+            return False
+        return True
+
+
     def infopath(self,dstpath:str,fin:bool=False) -> str:
         if fin:
             return f"{dstpath}_{self.name}_fin.csv"
@@ -56,13 +95,14 @@ class vszip_ssimulacra2(metric):
         return {
             "ssimulacra2":mean(ssimulacra2),
         }
-        
+
 class vszip_xpsnr(metric):
-    def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.harmonic,temporal:bool=True,inf:int|float=100):
+    def __init__(self,charset:str="utf-8",mean_mode:MEAN=MEAN.harmonic,use_vspipe:bool=True,temporal:bool=True,inf:int|float=100):
         self.provide=["xpsnr","xpsnr-u","xpsnr-v","xpsnr-yuv"]
         self.name="vszip_xpsnr"
         self.charset=charset
         self.mean_mode=mean_mode
+        self.use_vspipe=use_vspipe
         self.temporal=temporal
         self.inf=inf 
         #xpsnr's range is 0..inf
@@ -86,7 +126,44 @@ class vszip_xpsnr(metric):
         script+=f'last=xvs.props2csv(last,["XPSNR_Y","XPSNR_U","XPSNR_V"],["Y","U","V"],"{self.infopath(dstpath)}")\n'
         script+=f'last.set_output()'
         return script
-    
+
+    def run_without_vsipe(self, orgscript:str, dstpath:str):
+        with open(orgscript,'r',encoding=self.charset) as file:
+            script=file.read()
+        
+        rex=re.compile(r"(.+)\.set_output\(\)")
+        
+        match=rex.search(script)
+        clip=match.group(1)
+        
+        script=rex.sub("",script)
+        script+=f'\nimport xvs\n'
+        script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
+        script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
+        script+=f'last=core.vszip.XPSNR({clip},dst,temporal={self.temporal},verbose=True)\n'
+        script+=textwrap.dedent(
+        r"""        
+        import time
+        with open(r"<output>","w") as file:
+            file.write("n\tY\tU\tV\n")
+            length=len(src)
+            stime=time.time()
+            for i in range(length):
+                fprop=last.get_frame(i).props
+                file.write(f"{i}\t{fprop["XPSNR_Y"]}\t{fprop["XPSNR_U"]}\t{fprop["XPSNR_V"]}\n")
+                print(f"\r{i+1}/{length}",end="",flush=True)
+            print()
+            etime=time.time()
+            fps=length/(etime-stime)
+            print(f"{fps:.02f} fps")
+        """.replace("<output>",self.infopath(dstpath)))
+        try:
+            exec(script)
+        except:
+            return False
+        return True
+
+
     def infopath(self,dstpath:str,fin:bool=False) -> str:
         if fin:
             return f"{dstpath}_{self.name}_fin.csv"
@@ -124,7 +201,6 @@ class vszip_xpsnr(metric):
                 xpsnrv.append(V)
                 xpsnryuv.append((Y*4+U+V)/6)#weighted average 4:1:1 for yuv
         else:
-            
             for line in data:
                 Y,U,V=line['Y'],line['U'],line['V']
                 YUV_NUM=0
