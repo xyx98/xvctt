@@ -26,7 +26,7 @@ class gmsd(metric):
         script+=f'\nimport xvs\n'
         script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
-        script+=f'last=xvs.GMSD2csv({clip},dst,file="{self.infopath(dstpath)}.csv",planes=[0,1,2])\n'
+        script+=f'last=xvs.GMSD2csv({clip},dst,file=r"{self.infopath(dstpath)}.csv",planes=[0,1,2])\n'
         script+=f'last.set_output()'
         return script
 

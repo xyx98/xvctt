@@ -28,7 +28,7 @@ class dssim(metric):
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format=vs.RGB24,matrix_in_s="709")\n'
         script+=f'{clip}=core.resize.Spline36({clip},format=vs.RGB24,matrix_in_s="709")\n'
         script+=f'last=core.dssim.dssim({clip},dst)\n'
-        script+=f'last=xvs.props2csv(last,["dssim_score","dssim_ssim"],["dssim","ssim"],"{self.infopath(dstpath)}")\n'
+        script+=f'last=xvs.props2csv(last,["dssim_score","dssim_ssim"],["dssim","ssim"],r"{self.infopath(dstpath)}")\n'
         script+=f'last.set_output()'
         return script
 

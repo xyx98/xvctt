@@ -30,7 +30,7 @@ class vship_ssimulacra2(metric):
         script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
         script+=f'last=core.vship.SSIMULACRA2({clip},dst,numStream={self.numStream},gpu_id={self.gpu_id})\n'
-        script+=f'last=xvs.props2csv(last,["_SSIMULACRA2"],["SSIMULACRA2"],"{self.infopath(dstpath)}")\n'
+        script+=f'last=xvs.props2csv(last,["_SSIMULACRA2"],["SSIMULACRA2"],r"{self.infopath(dstpath)}")\n'
         script+=f'last.set_output()'
         return script
     
@@ -127,7 +127,7 @@ class vship_butteraugli(metric):
         script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
         script+=f'last=core.vship.BUTTERAUGLI({clip},dst,numStream={self.numStream},gpu_id={self.gpu_id})\n'
-        script+=f'last=xvs.props2csv(last,["_BUTTERAUGLI_3Norm","_BUTTERAUGLI_INFNorm","_BUTTERAUGLI_QNorm"],["butteraugli_3norm","butteraugli_infnorm","butteraugli_{self.qnorm}norm"],"{self.infopath(dstpath)}")\n'
+        script+=f'last=xvs.props2csv(last,["_BUTTERAUGLI_3Norm","_BUTTERAUGLI_INFNorm","_BUTTERAUGLI_QNorm"],["butteraugli_3norm","butteraugli_infnorm","butteraugli_{self.qnorm}norm"],r"{self.infopath(dstpath)}")\n'
         script+=f'last.set_output()'
         return script
     
@@ -146,7 +146,7 @@ class vship_butteraugli(metric):
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
         script+=f'last=core.vship.BUTTERAUGLI({clip},dst,numStream={self.numStream},gpu_id={self.gpu_id})\n'
 
-        titlestr=r"n\tbutteraugli_3norm\tbutteraugli_infnorm"#\tbutteraugli_{self.qnorm}norm
+        titlestr=r"n\tbutteraugli_3norm\tbutteraugli_infnorm"
         linestr=r'{i}\t{fprop["_BUTTERAUGLI_3Norm"]}\t{fprop["_BUTTERAUGLI_INFNorm"]}'
         if not self.qnorm==3:
             titlestr+=rf"\tbutteraugli_{self.qnorm}norm"
@@ -257,7 +257,7 @@ class vship_cvvdp(metric):
         script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
         script+=f'last=core.vship.CVVDP({clip},dst,model_name="{self.model.name}",resizeToDisplay={self.resizeToDisplay},gpu_id={self.gpu_id})\n'
-        script+=f'last=xvs.props2csv(last,["_CVVDP"],["{self.provide[0]}"],"{self.infopath(dstpath)}")\n'
+        script+=f'last=xvs.props2csv(last,["_CVVDP"],["{self.provide[0]}"],r"{self.infopath(dstpath)}")\n'
         script+=f'last.set_output()'
         return script
     

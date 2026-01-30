@@ -27,7 +27,7 @@ class vszip_ssimulacra2(metric):
         script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
         script+=f'last=core.vszip.SSIMULACRA2({clip},dst)\n'
-        script+=f'last=xvs.props2csv(last,["SSIMULACRA2"],["SSIMULACRA2"],"{self.infopath(dstpath)}")\n'
+        script+=f'last=xvs.props2csv(last,["SSIMULACRA2"],["SSIMULACRA2"],r"{self.infopath(dstpath)}")\n'
         script+=f'last.set_output()'
         return script
     
@@ -123,7 +123,7 @@ class vszip_xpsnr(metric):
         script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
         script+=f'last=core.vszip.XPSNR({clip},dst,temporal={self.temporal},verbose=True)\n'
-        script+=f'last=xvs.props2csv(last,["XPSNR_Y","XPSNR_U","XPSNR_V"],["Y","U","V"],"{self.infopath(dstpath)}")\n'
+        script+=f'last=xvs.props2csv(last,["XPSNR_Y","XPSNR_U","XPSNR_V"],["Y","U","V"],r"{self.infopath(dstpath)}")\n'
         script+=f'last.set_output()'
         return script
 

@@ -57,7 +57,7 @@ class vmafcuda(metric):
         script+=f'\nimport xvs\n'
         script+=f'dst=core.lsmas.LWLibavSource(r"{dstpath}",cache=False)\n'
         script+=f'dst=core.resize.Spline36(dst,{clip}.width,{clip}.height,format={clip}.format)\n'
-        script+=f'last=core.vmafcuda.VMAF({clip}, dst, log_path="{self.infopath(dstpath)}", log_format=1, model={model},feature={feature})\n'
+        script+=f'last=core.vmafcuda.VMAF({clip}, dst, log_path=r"{self.infopath(dstpath)}", log_format=1, model={model},feature={feature})\n'
         script+=f'last.set_output()'
         return script
 
