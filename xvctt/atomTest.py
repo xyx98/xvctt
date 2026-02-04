@@ -27,7 +27,7 @@ class atomTest:
             output=os.path.join(self.workdir,self.output)
             vpypath=self.alt_vpypath if self.alt_vpypath else self.vpypath
             cmdline=f'{self.vspipe} -c y4m {vpypath} -|{self.encoder.gencmd(self.cmd,self.q,output+'.'+self.encoder.ext)}'
-            print(cmdline)
+            #print(cmdline)
             t=time.time()
             sp=subprocess.Popen(cmdline,shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
             logtext=""
