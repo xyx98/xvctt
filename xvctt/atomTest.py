@@ -8,7 +8,7 @@ import subprocess
 import time
 
 class atomTest:
-    def __init__(self,vspipe:str,vpypath:str,cmd:str,q:int|float|str,workdir:str,output:str,encoder:encoder_base,metrics:metric|list[metric]):
+    def __init__(self,vspipe:str,vpypath:str,cmd:str,q:int|float|str,workdir:str,output:str,encoder:encoder_base,metrics:metric|list[metric],alt_vpypath:str|None):
         self.vpypath=vpypath
         self.vspipe=vspipe
         self.cmd=cmd
@@ -17,6 +17,7 @@ class atomTest:
         self.output=output
         self.encoder=encoder
         self.metrics=metrics if isinstance(metrics,list) else [metrics]
+        self.alt_vpypath=alt_vpypath #altnative vpy script for encode,mainly for encoder not support convert bitdepth internal.
         self.time=-1
         self.succuss=0 #0:not run yet 1:succuss -1:fail
         os.makedirs(self.workdir,exist_ok=True)
@@ -24,8 +25,9 @@ class atomTest:
     def encode(self) -> bool:
         if self.encoder.multipass<2:
             output=os.path.join(self.workdir,self.output)
-            cmdline=f'{self.vspipe} -c y4m {self.vpypath} -|{self.encoder.gencmd(self.cmd,self.q,output+'.'+self.encoder.ext)}'
-            #print(cmdline)
+            vpypath=self.alt_vpypath if self.alt_vpypath else self.vpypath
+            cmdline=f'{self.vspipe} -c y4m {vpypath} -|{self.encoder.gencmd(self.cmd,self.q,output+'.'+self.encoder.ext)}'
+            print(cmdline)
             t=time.time()
             sp=subprocess.Popen(cmdline,shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
             logtext=""

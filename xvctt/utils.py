@@ -4,7 +4,7 @@ from enum import Enum
 import vapoursynth as vs
 import functools
 import json
-
+import re
 
 class MEAN(Enum):
     harmonic=0,
@@ -88,3 +88,15 @@ def loadjson(p:str) -> dict|list:
     with open(p,'r') as file:
         data=json.loads(file.read())
     return data
+
+def add_fmtc_bitdepth_for_vpy(vpypath:str,bitdepth:int,charset:str="utf-8") -> str:
+    with open(vpypath,'r',encoding=charset) as file:
+        script=file.read()
+
+    rex=re.compile(r"(.+)\.set_output\(\)")
+    match=rex.search(script)
+    clip=match.group(1)
+    script=rex.sub("",script)
+    script+=f"{clip}=core.fmtc.bitdepth({clip},bits={bitdepth},dmode=1)\n"
+    script+=f"{clip}.set_output()"
+    return script

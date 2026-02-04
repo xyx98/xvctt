@@ -22,7 +22,7 @@ class mainTest:
         self.singles:list[singleTest]=[]
         self.workpath=workpath
         
-    def add(self,encoder:encoder_base,cmd:str,qlist:list[int|float|str],output:str,workdir:str=""):
+    def add(self,encoder:encoder_base,cmd:str,qlist:list[int|float|str],output:str,workdir:str="",convertbits:int=-1,charset:str="utf-8"):
         realworkdir=f"{encoder.name}_{output}" if not workdir else workdir
         realworkdir=os.path.join(self.workpath,realworkdir)
         st=singleTest(
@@ -33,7 +33,9 @@ class mainTest:
             workdir=realworkdir,
             output=output,
             encoder=encoder,
-            metrics=self.metrics
+            metrics=self.metrics,
+            convertbits=convertbits,
+            charset=charset
         )
         self.singles.append(st)
             

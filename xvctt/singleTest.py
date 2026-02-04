@@ -1,12 +1,12 @@
 from .atomTest import atomTest
 from .encoders.base import encoder_base
 from .metrics.base import metric
-from .utils import loadjson
+from .utils import loadjson,add_fmtc_bitdepth_for_vpy
 import os
 import json
 
 class singleTest:
-    def __init__(self,vspipe:str,vpypath:str,cmd:str,qlist:list[int|float|str],workdir:str,output:str,encoder:encoder_base,metrics:metric|list[metric],name:str|None = None):
+    def __init__(self,vspipe:str,vpypath:str,cmd:str,qlist:list[int|float|str],workdir:str,output:str,encoder:encoder_base,metrics:metric|list[metric],name:str|None = None,convertbits:int=-1,charset:str="utf-8"):
         self.vpypath=vpypath
         self.vspipe=vspipe
         self.cmd=cmd
@@ -17,10 +17,11 @@ class singleTest:
         self.metrics=metrics if isinstance(metrics,list) else [metrics]
         self.time=-1
         self.name = self.output if name is None else name
-        
+        self.convertbits=convertbits
+        self.charset=charset 
+
         os.makedirs(self.workdir,exist_ok=True)
         self.atoms:list[atomTest]=[]
-        
         
         for q in self.qlist:
             self.atoms.append(
@@ -32,13 +33,20 @@ class singleTest:
                     workdir=workdir,
                     output=output+f"_q{q}",
                     encoder=self.encoder,
-                    metrics=self.metrics
+                    metrics=self.metrics,
+                    alt_vpypath=".converted.vpy" if self.convertbits>0 else self.vpypath 
                 )
             )
         
     def run(self):
+        if self.convertbits>0:
+            with open(".converted.vpy","w",encoding=self.charset) as file:
+                file.write(add_fmtc_bitdepth_for_vpy(self.vpypath,self.convertbits,self.charset))
+
         for atom in self.atoms:
             atom.run()
+        if self.convertbits>0:
+            os.remove(".converted.vpy")
             
     def collect_result(self) -> dict:
         results={}
